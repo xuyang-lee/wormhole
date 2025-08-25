@@ -46,7 +46,7 @@ func addMessage(app fyne.App, messageList *fyne.Container, msg string) {
 
 func ClearMessages(messageList *fyne.Container) Func {
 	return func() {
-		messageList.Objects = make([]fyne.CanvasObject, 0, len(messageList.Objects))
+		messageList.RemoveAll()
 	}
 }
 
