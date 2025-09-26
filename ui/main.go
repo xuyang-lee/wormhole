@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/xuyang-lee/wormhole/ui/button"
+	"github.com/xuyang-lee/wormhole/ui/receive"
 	"image/color"
 )
 
@@ -47,22 +48,11 @@ func main() {
 		msgVScroll,
 	)
 
+	go receive.Receive(a, messageList, msgVScroll)
+	//go receive.TestReceive(a, messageList, msgVScroll)
+
 	w.SetContent(content)
 	w.Resize(fyne.NewSize(400, 500)) // 初始窗口大小
 	w.ShowAndRun()
 
-}
-
-func addMessage(app fyne.App, messages *fyne.Container, msg string) {
-	label := widget.NewLabel(msg)
-	label.Wrapping = fyne.TextWrapWord
-
-	// 复制按钮，只复制当前消息
-	copyBtn := widget.NewButton("复制", func() {
-		app.Clipboard().SetContent(msg)
-	})
-
-	// 每条消息一行：Label + Button
-	row := container.NewHBox(label, copyBtn)
-	messages.Add(row)
 }

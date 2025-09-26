@@ -8,9 +8,9 @@ import (
 var Linked bool
 
 func Dial(addr string) error {
-	Linked = true
-	fmt.Println(addr)
-	return nil
+	//Linked = true
+	//fmt.Println(addr)
+	//return nil
 
 	var conn *websocket.Conn
 	var err error
@@ -35,10 +35,9 @@ func Dial(addr string) error {
 				return err
 			}
 			// 预期的关闭，输出关闭提示，优雅退出
-			fmt.Println("server close connect")
+			fmt.Println("hole close connect")
 			return nil
 		}
 		fmt.Println(string(data))
-
 	}
 }
