@@ -85,3 +85,9 @@ func SetClipboard(app fyne.App, msg string) Func {
 		app.Clipboard().SetContent(msg)
 	}
 }
+
+func ScrollToBottom(msgVScroll *container.Scroll) {
+	fyne.Do(func() {
+		msgVScroll.ScrollToBottom()
+	})
+}

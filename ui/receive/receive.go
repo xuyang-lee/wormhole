@@ -26,15 +26,15 @@ func Receive(app fyne.App, messageList *fyne.Container, msgVScroll *container.Sc
 			switch metaData.MsgType {
 			case websocket.TextMessage:
 				common.AddReceiveMessageWithCopyButton(app, messageList, string(metaData.Body))
-				msgVScroll.ScrollToBottom()
+				common.ScrollToBottom(msgVScroll)
 			case websocket.BinaryMessage:
-			case websocket.CloseMessage:
-				common.AddSystemMessage(messageList, "对方主动关闭链接！")
-				msgVScroll.ScrollToBottom()
+			case -1: // websocket协议，(收到websocket.CloseMessage时链接已关闭，接受方收到的是-1而不是websocket.CloseMessage)
+				common.AddSystemMessage(messageList, "关闭链接！")
+				common.ScrollToBottom(msgVScroll)
 				break readCh
 			default:
-				common.AddSystemMessage(messageList, fmt.Sprintf("unknown type msg: %s", string(metaData.Body)))
-				msgVScroll.ScrollToBottom()
+				common.AddSystemMessage(messageList, fmt.Sprintf("unknown type:%d msg: %s", metaData.MsgType, string(metaData.Body)))
+				common.ScrollToBottom(msgVScroll)
 			}
 		}
 	}
@@ -63,14 +63,14 @@ func TestReceive(app fyne.App, messageList *fyne.Container, msgVScroll *containe
 		switch metaData.MsgType {
 		case websocket.TextMessage:
 			common.AddReceiveMessageWithCopyButton(app, messageList, string(metaData.Body))
-			msgVScroll.ScrollToBottom()
+			common.ScrollToBottom(msgVScroll)
 		case websocket.BinaryMessage:
 		case websocket.CloseMessage:
 			common.AddSystemMessage(messageList, "对方主动关闭链接！")
-			msgVScroll.ScrollToBottom()
+			common.ScrollToBottom(msgVScroll)
 		default:
 			common.AddSystemMessage(messageList, fmt.Sprintf("unknown type msg: %s", string(metaData.Body)))
-			msgVScroll.ScrollToBottom()
+			common.ScrollToBottom(msgVScroll)
 		}
 	}
 }

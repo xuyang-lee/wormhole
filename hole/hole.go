@@ -15,6 +15,14 @@ var linkLock sync.RWMutex
 var linkMap map[string]*session.Session
 var listeners []Listener
 
+func InitLinkMap() {
+	once.Do(func() {
+		linkLock.Lock()
+		defer linkLock.Unlock()
+		linkMap = make(map[string]*session.Session, 10)
+	})
+}
+
 func GetLink(uuid string) (*session.Session, bool) {
 	linkLock.RLock()
 	defer linkLock.RUnlock()

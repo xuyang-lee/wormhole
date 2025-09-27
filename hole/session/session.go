@@ -89,6 +89,12 @@ func (session *Session) receiver() {
 			}
 			// 预期的关闭，输出关闭提示，优雅退出
 			fmt.Println("[receiver]: ", "hole close connect")
+			receiveElem := MateElem{MsgType: msgType, Body: data}
+			select {
+			case session.receiveChan <- receiveElem:
+			case <-session.ctx.Done():
+				return
+			}
 			return
 		}
 		receiveElem := MateElem{MsgType: msgType, Body: data}

@@ -21,18 +21,18 @@ func SendText(app fyne.App, input *widget.Entry, messageList *fyne.Container, ms
 		link, ok := hole.GetLink(common.CurLinkKey)
 		if !ok {
 			common.AddSystemMessage(messageList, "can not get connection")
-			msgVScroll.ScrollToBottom()
+			common.ScrollToBottom(msgVScroll)
 			return
 		}
 
 		err := link.Send(websocket.TextMessage, []byte(msg))
 		if err != nil {
 			common.AddSystemMessage(messageList, fmt.Sprintf("send msg err: %v", err.Error()))
-			msgVScroll.ScrollToBottom()
+			common.ScrollToBottom(msgVScroll)
 		}
 
 		common.AddSendMessageWithCopyButton(app, messageList, msg)
-		msgVScroll.ScrollToBottom()
+		common.ScrollToBottom(msgVScroll)
 
 		input.SetText("") // 清空输入框
 	}
@@ -48,18 +48,18 @@ func SendFile(input *widget.Entry, messageList *fyne.Container, msgVScroll *cont
 		link, ok := hole.GetLink(common.CurLinkKey)
 		if !ok {
 			common.AddSystemMessage(messageList, "can not get connection")
-			msgVScroll.ScrollToBottom()
+			common.ScrollToBottom(msgVScroll)
 			return
 		}
 
 		err := link.Send(websocket.TextMessage, []byte(filepath))
 		if err != nil {
 			common.AddSystemMessage(messageList, fmt.Sprintf("send file err: %v", err.Error()))
-			msgVScroll.ScrollToBottom()
+			common.ScrollToBottom(msgVScroll)
 		}
 
 		common.AddSystemMessage(messageList, filepath)
-		msgVScroll.ScrollToBottom()
+		common.ScrollToBottom(msgVScroll)
 
 		input.SetText("") // 清空输入框
 	}
@@ -70,16 +70,19 @@ func SendClose(messageList *fyne.Container, msgVScroll *container.Scroll) common
 		link, ok := hole.GetLink(common.CurLinkKey)
 		if !ok {
 			common.AddSystemMessage(messageList, "can not get connection")
-			msgVScroll.ScrollToBottom()
+			common.ScrollToBottom(msgVScroll)
 			return
 		}
 
 		err := link.Send(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, "bye bye"))
 		if err != nil {
-			common.AddSystemMessage(messageList, fmt.Sprintf("send msg err: %v", err.Error()))
-			msgVScroll.ScrollToBottom()
+			common.AddSystemMessage(messageList, fmt.Sprintf("send close err: %v", err.Error()))
+			common.ScrollToBottom(msgVScroll)
 		}
 		common.CurLinkKey = ""
+		common.AddSystemMessage(messageList, "you close the connect")
+		common.ScrollToBottom(msgVScroll)
+		return
 	}
 }
 

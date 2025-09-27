@@ -13,6 +13,7 @@ import (
 	"github.com/xuyang-lee/wormhole/ui/common"
 	"github.com/xuyang-lee/wormhole/ui/receive"
 	"image/color"
+	"time"
 )
 
 var address string
@@ -25,6 +26,7 @@ func main() {
 	// 开启后台服务
 	go hole.Init()
 
+	time.Sleep(time.Second)
 	// title 信息及复制按钮
 	address = fmt.Sprintf(":%d", config.Conf.Port)
 	title := canvas.NewText(address, color.RGBA{0, 255, 0, 255})
@@ -56,7 +58,10 @@ func main() {
 		msgVScroll,
 	)
 
-	listen := new(common.Listener)
+	listen := common.NewListener(func() {
+		common.AddSystemMessage(messageList, "已连接")
+		common.ScrollToBottom(msgVScroll)
+	})
 	// 链接监听，注册监听者
 	hole.RegisterListener(listen)
 	// 开启接受后台

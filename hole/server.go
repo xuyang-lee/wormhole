@@ -17,9 +17,7 @@ func Init() {
 func runServer() {
 	config.InitAppConfig()
 
-	once.Do(func() {
-		linkMap = make(map[string]*session.Session, 10)
-	})
+	InitLinkMap()
 
 	// 最原生的升级手段
 	//http.HandleFunc("/ws", wsHandler)
