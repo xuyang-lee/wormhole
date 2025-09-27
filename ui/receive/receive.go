@@ -14,13 +14,14 @@ import (
 func Receive(app fyne.App, messageList *fyne.Container, msgVScroll *container.Scroll) {
 	for {
 		time.Sleep(10 * time.Second)
-		link, err := hole.GetRandLink()
-		if err != nil {
+		link, ok := hole.GetLink(common.CurLinkKey)
+		if !ok {
 			time.Sleep(5 * time.Second)
 			continue
 		}
 
 		ch := link.GetReceiveChannel()
+	readCh:
 		for metaData := range ch {
 			switch metaData.MsgType {
 			case websocket.TextMessage:
@@ -30,6 +31,7 @@ func Receive(app fyne.App, messageList *fyne.Container, msgVScroll *container.Sc
 			case websocket.CloseMessage:
 				common.AddSystemMessage(messageList, "对方主动关闭链接！")
 				msgVScroll.ScrollToBottom()
+				break readCh
 			default:
 				common.AddSystemMessage(messageList, fmt.Sprintf("unknown type msg: %s", string(metaData.Body)))
 				msgVScroll.ScrollToBottom()

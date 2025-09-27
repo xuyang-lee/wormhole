@@ -6,7 +6,6 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/gorilla/websocket"
-	"github.com/xuyang-lee/wormhole/cmd/client"
 	"github.com/xuyang-lee/wormhole/hole"
 	"github.com/xuyang-lee/wormhole/ui/common"
 	"time"
@@ -19,14 +18,14 @@ func SendText(app fyne.App, input *widget.Entry, messageList *fyne.Container, ms
 			return
 		}
 
-		link, err := hole.GetRandLink()
-		if err != nil {
+		link, ok := hole.GetLink(common.CurLinkKey)
+		if !ok {
 			common.AddSystemMessage(messageList, "can not get connection")
 			msgVScroll.ScrollToBottom()
 			return
 		}
 
-		err = link.Send(websocket.TextMessage, []byte(msg))
+		err := link.Send(websocket.TextMessage, []byte(msg))
 		if err != nil {
 			common.AddSystemMessage(messageList, fmt.Sprintf("send msg err: %v", err.Error()))
 			msgVScroll.ScrollToBottom()
@@ -39,6 +38,51 @@ func SendText(app fyne.App, input *widget.Entry, messageList *fyne.Container, ms
 	}
 }
 
+func SendFile(input *widget.Entry, messageList *fyne.Container, msgVScroll *container.Scroll) common.Func {
+	return func() {
+		filepath := input.Text
+		if filepath == "" {
+			return
+		}
+
+		link, ok := hole.GetLink(common.CurLinkKey)
+		if !ok {
+			common.AddSystemMessage(messageList, "can not get connection")
+			msgVScroll.ScrollToBottom()
+			return
+		}
+
+		err := link.Send(websocket.TextMessage, []byte(filepath))
+		if err != nil {
+			common.AddSystemMessage(messageList, fmt.Sprintf("send file err: %v", err.Error()))
+			msgVScroll.ScrollToBottom()
+		}
+
+		common.AddSystemMessage(messageList, filepath)
+		msgVScroll.ScrollToBottom()
+
+		input.SetText("") // 清空输入框
+	}
+}
+
+func SendClose(messageList *fyne.Container, msgVScroll *container.Scroll) common.Func {
+	return func() {
+		link, ok := hole.GetLink(common.CurLinkKey)
+		if !ok {
+			common.AddSystemMessage(messageList, "can not get connection")
+			msgVScroll.ScrollToBottom()
+			return
+		}
+
+		err := link.Send(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, "bye bye"))
+		if err != nil {
+			common.AddSystemMessage(messageList, fmt.Sprintf("send msg err: %v", err.Error()))
+			msgVScroll.ScrollToBottom()
+		}
+		common.CurLinkKey = ""
+	}
+}
+
 func ClearMessages(messageList *fyne.Container) common.Func {
 	return func() {
 		messageList.RemoveAll()
@@ -47,7 +91,7 @@ func ClearMessages(messageList *fyne.Container) common.Func {
 
 func LinkWindow(app fyne.App) common.Func {
 	return func() {
-		if client.Linked { //如果链接成功,再次点击
+		if common.CurLinkKey != "" { //如果链接成功,再次点击
 			w := app.NewWindow("Link! input the address!")
 			out := widget.NewLabel("your wormhole has linked one")
 			w.SetContent(out)
@@ -77,8 +121,8 @@ func Link(w fyne.Window, input *widget.Entry) common.Func {
 		addr := input.Text
 
 		output := widget.NewEntry()
-		if err := client.Dial(addr); err != nil {
-			output.SetText("link failed... try again... err: " + err.Error())
+		if err := hole.Dial(addr); err != nil {
+			output.SetText("link failed... please try again... err: " + err.Error())
 		} else {
 			output.SetText("success! 1s auto close")
 		}

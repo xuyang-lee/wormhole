@@ -19,6 +19,8 @@ const (
 	DirectionReceive
 )
 
+var CurLinkKey string
+
 func GetDirection(d int) string {
 	switch d {
 	case DirectionSystem:

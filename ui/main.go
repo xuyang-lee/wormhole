@@ -1,12 +1,16 @@
 package main
 
 import (
+	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"github.com/xuyang-lee/wormhole/config"
+	"github.com/xuyang-lee/wormhole/hole"
 	"github.com/xuyang-lee/wormhole/ui/button"
+	"github.com/xuyang-lee/wormhole/ui/common"
 	"github.com/xuyang-lee/wormhole/ui/receive"
 	"image/color"
 )
@@ -18,8 +22,11 @@ func main() {
 	a := app.New()
 	w := a.NewWindow("P2P Sender")
 
+	// 开启后台服务
+	go hole.Init()
+
 	// title 信息及复制按钮
-	address = "ssss:port" //写一个假的，websocket实现了替换成真的
+	address = fmt.Sprintf(":%d", config.Conf.Port)
 	title := canvas.NewText(address, color.RGBA{0, 255, 0, 255})
 	title.TextSize = 12
 	addrCopyBtn := widget.NewButton("copy addr", button.CopyAddr(a, address))
@@ -36,18 +43,23 @@ func main() {
 
 	// 按钮
 	sendTxtBtn := widget.NewButton("send", button.SendText(a, input, messageList, msgVScroll))
-	sendFileBtn := widget.NewButton("send file", button.SendText(a, input, messageList, msgVScroll))
+	sendFileBtn := widget.NewButton("send file", button.SendFile(input, messageList, msgVScroll))
+	closeBtn := widget.NewButton("close", button.SendClose(messageList, msgVScroll))
 	clearBtn := widget.NewButton("clear", button.ClearMessages(messageList))
 
-	sendBtn := container.NewGridWithColumns(3, sendFileBtn, sendTxtBtn, clearBtn)
+	btnGrid := container.NewGridWithColumns(4, closeBtn, sendFileBtn, sendTxtBtn, clearBtn)
 	// 界面布局（竖直排列）
 	content := container.NewBorder(
 		container.NewBorder(title, nil, nil, container.NewGridWithColumns(2, linkBtn, addrCopyBtn), l),
-		container.NewVBox(sendBtn, input),
+		container.NewVBox(btnGrid, input),
 		nil, nil,
 		msgVScroll,
 	)
 
+	listen := new(common.Listener)
+	// 链接监听，注册监听者
+	hole.RegisterListener(listen)
+	// 开启接受后台
 	go receive.Receive(a, messageList, msgVScroll)
 	//go receive.TestReceive(a, messageList, msgVScroll)
 

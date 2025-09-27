@@ -32,7 +32,7 @@ func runServer() {
 	// 封装方法升级
 	router.GET("/ws", webtools.Upgrade(keepConnect))
 	log.Println("running")
-	if err := router.Run(fmt.Sprintf("%d", config.Conf.Port)); err != nil {
+	if err := router.Run(fmt.Sprintf(":%d", config.Conf.Port)); err != nil {
 		panic(err.Error())
 	}
 }
