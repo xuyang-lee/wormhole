@@ -28,7 +28,7 @@ func main() {
 
 	time.Sleep(time.Second)
 	// title 信息及复制按钮
-	address = fmt.Sprintf(":%d", config.Conf.Port)
+	address = fmt.Sprintf("ws://%s:%d/ws", config.Conf.Addr, config.Conf.Port)
 	title := canvas.NewText(address, color.RGBA{0, 255, 0, 255})
 	title.TextSize = 12
 	addrCopyBtn := widget.NewButton("copy addr", button.CopyAddr(a, address))

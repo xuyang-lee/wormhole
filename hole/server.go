@@ -6,6 +6,7 @@ import (
 	"github.com/gorilla/websocket"
 	"github.com/xuyang-lee/wormhole/config"
 	"github.com/xuyang-lee/wormhole/hole/session"
+	"github.com/xuyang-lee/wormhole/utils"
 	"github.com/xuyang-lee/wormhole/webtools"
 	"log"
 )
@@ -18,6 +19,14 @@ func runServer() {
 	config.InitAppConfig()
 
 	InitLinkMap()
+
+	var err error
+	config.Conf.Addr, err = utils.OutboundIP()
+	if err != nil {
+		log.Println("get out ip err", err.Error())
+		config.Conf.Addr = "localhost"
+	}
+	log.Println("\n", config.Conf.Addr)
 
 	// 最原生的升级手段
 	//http.HandleFunc("/ws", wsHandler)

@@ -8,7 +8,8 @@ import (
 )
 
 type AppConfig struct {
-	Port int `yaml:"port"`
+	Port int    `yaml:"port"`
+	Addr string `yaml:"addr"`
 }
 
 var Conf AppConfig
