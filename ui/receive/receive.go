@@ -68,6 +68,7 @@ func TestReceive(app fyne.App, messageList *fyne.Container, msgVScroll *containe
 		case websocket.CloseMessage:
 			common.AddSystemMessage(messageList, "对方主动关闭链接！")
 			common.ScrollToBottom(msgVScroll)
+			common.CurLinkKey = ""
 		default:
 			common.AddSystemMessage(messageList, fmt.Sprintf("unknown type msg: %s", string(metaData.Body)))
 			common.ScrollToBottom(msgVScroll)

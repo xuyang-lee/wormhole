@@ -46,7 +46,11 @@ func AddMessage(messageList *fyne.Container, msg string, direction int) {
 		t, nil, nil, nil,
 		label,
 	)
-	messageList.Add(row)
+	// 使用 QueueEvent 确保 UI 操作在主线程执行
+	fyne.Do(func() {
+		messageList.Add(row)
+		messageList.Refresh() // 确保容器刷新显示
+	})
 }
 
 func AddSystemMessage(messageList *fyne.Container, msg string) {
@@ -69,7 +73,10 @@ func AddMessageWithCopyButton(app fyne.App, messageList *fyne.Container, msg str
 		t, nil, nil, copyBtn,
 		label,
 	)
-	messageList.Add(row)
+	fyne.Do(func() {
+		messageList.Add(row)
+		messageList.Refresh() // 确保容器刷新显示
+	})
 }
 
 func AddSendMessageWithCopyButton(app fyne.App, messageList *fyne.Container, msg string) {
