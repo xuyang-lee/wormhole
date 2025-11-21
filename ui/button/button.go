@@ -4,10 +4,15 @@ import (
 	"fmt"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/gorilla/websocket"
 	"github.com/xuyang-lee/wormhole/hole"
 	"github.com/xuyang-lee/wormhole/ui/common"
+	"io"
+	"net"
+	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -40,6 +45,23 @@ func SendText(app fyne.App, input *widget.Entry, messageList *fyne.Container, ms
 
 func SendFile(input *widget.Entry, messageList *fyne.Container, msgVScroll *container.Scroll) common.Func {
 	return func() {
+		{
+			peerAddr := "对方地址"
+			var w fyne.Window
+			fd := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
+				if err != nil || reader == nil {
+					return
+				}
+				path := reader.URI().Path()
+				err = sendFile(peerAddr, path)
+				if err != nil {
+					//output.SetText(output.Text + "\n文件发送失败: " + err.Error())
+				} else {
+					//output.SetText(output.Text + "\n已发送文件: " + path)
+				}
+			}, w)
+			fd.Show()
+		}
 		filepath := input.Text
 		if filepath == "" {
 			return
@@ -142,4 +164,28 @@ func Link(w fyne.Window, input *widget.Entry) common.Func {
 
 func CopyAddr(app fyne.App, msg string) common.Func {
 	return common.SetClipboard(app, msg)
+}
+
+// 发送文件
+func sendFile(addr, path string) error {
+	conn, err := net.Dial("tcp", addr)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	filename := filepath.Base(path)
+	// 协议: FILE:<文件名>\n<文件内容>
+	_, err = conn.Write([]byte("FILE:" + filename + "\n"))
+	if err != nil {
+		return err
+	}
+	_, err = io.Copy(conn, file)
+	return err
 }

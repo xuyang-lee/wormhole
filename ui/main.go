@@ -13,12 +13,17 @@ import (
 	"github.com/xuyang-lee/wormhole/ui/common"
 	"github.com/xuyang-lee/wormhole/ui/receive"
 	"image/color"
+	"os"
 	"time"
 )
 
 var address string
 
 func main() {
+
+	cwd, _ := os.Getwd()
+	fmt.Println("WorkDir =", cwd)
+
 	// 创建应用
 	a := app.New()
 	w := a.NewWindow("P2P Sender")

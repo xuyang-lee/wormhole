@@ -2,9 +2,11 @@ package config
 
 import (
 	"fmt"
+	"github.com/xuyang-lee/wormhole/utils"
 	"gopkg.in/yaml.v3"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 type AppConfig struct {
@@ -22,7 +24,7 @@ func InitAppConfig() {
 	dir, _ := os.Getwd()
 	fmt.Println(dir)
 
-	url := fmt.Sprintf("config/config.yaml")
+	url := filepath.Join(utils.GetFilePath(), "config", "config.yaml")
 
 	if data, err = os.ReadFile(url); err != nil {
 		panic(fmt.Sprintf("无法读取配置文件: %s, 错误: %v", url, err))

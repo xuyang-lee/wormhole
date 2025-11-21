@@ -5,6 +5,8 @@ import (
 	"encoding/binary"
 	"github.com/google/uuid"
 	"net"
+	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -33,4 +35,29 @@ func OutboundIP() (string, error) {
 		return localAddr[:i], nil
 	}
 	return localAddr, nil
+}
+
+func GetFilePath() string {
+	// 第一优先：exe 同目录
+	exePath, err := os.Executable()
+	if err == nil {
+		exePath, _ = filepath.EvalSymlinks(exePath)
+		exeDir := filepath.Dir(exePath)
+
+		p := filepath.Join(exeDir, "config", "config.yaml")
+		if _, err := os.Stat(p); err == nil {
+			return exeDir
+		}
+	}
+
+	// 第二优先：工作目录（go run）
+	cwd, err := os.Getwd()
+	if err == nil {
+		p := filepath.Join(cwd, "config", "config.yaml")
+		if _, err := os.Stat(p); err == nil {
+			return cwd
+		}
+	}
+
+	panic("config.yaml not found in exeDir or workingDir")
 }
