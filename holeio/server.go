@@ -1,11 +1,11 @@
-package hole
+package holeio
 
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/xuyang-lee/wormhole/config"
-	"github.com/xuyang-lee/wormhole/hole/session"
+	"github.com/xuyang-lee/wormhole/holeio/session"
 	"github.com/xuyang-lee/wormhole/utils"
 	"github.com/xuyang-lee/wormhole/webtools"
 	"log"

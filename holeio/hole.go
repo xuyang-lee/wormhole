@@ -1,8 +1,8 @@
-package hole
+package holeio
 
 import (
 	"errors"
-	"github.com/xuyang-lee/wormhole/hole/session"
+	"github.com/xuyang-lee/wormhole/holeio/session"
 	"sync"
 )
 

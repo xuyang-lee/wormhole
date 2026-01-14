@@ -1,9 +1,9 @@
-package hole
+package holeio
 
 import (
 	"fmt"
 	"github.com/gorilla/websocket"
-	"github.com/xuyang-lee/wormhole/hole/session"
+	"github.com/xuyang-lee/wormhole/holeio/session"
 )
 
 func Dial(addr string) error {

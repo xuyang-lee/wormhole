@@ -3,7 +3,7 @@ package entity
 import (
 	"errors"
 	"fmt"
-	"github.com/xuyang-lee/wormhole/hole/protocol"
+	"github.com/xuyang-lee/wormhole/holeio/protocol"
 	"github.com/xuyang-lee/wormhole/utils"
 	"io"
 )

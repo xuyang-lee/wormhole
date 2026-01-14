@@ -5,8 +5,8 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"github.com/gorilla/websocket"
-	"github.com/xuyang-lee/wormhole/hole"
-	"github.com/xuyang-lee/wormhole/hole/session"
+	"github.com/xuyang-lee/wormhole/holeio"
+	"github.com/xuyang-lee/wormhole/holeio/session"
 	"github.com/xuyang-lee/wormhole/ui/common"
 	"time"
 )
@@ -14,7 +14,7 @@ import (
 func Receive(app fyne.App, messageList *fyne.Container, msgVScroll *container.Scroll) {
 	for {
 		time.Sleep(10 * time.Second)
-		link, ok := hole.GetLink(common.CurLinkKey)
+		link, ok := holeio.GetLink(common.CurLinkKey)
 		if !ok {
 			time.Sleep(5 * time.Second)
 			continue

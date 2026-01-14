@@ -7,7 +7,7 @@ import (
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/widget"
 	"github.com/gorilla/websocket"
-	"github.com/xuyang-lee/wormhole/hole"
+	"github.com/xuyang-lee/wormhole/holeio"
 	"github.com/xuyang-lee/wormhole/ui/common"
 	"io"
 	"net"
@@ -23,7 +23,7 @@ func SendText(app fyne.App, input *widget.Entry, messageList *fyne.Container, ms
 			return
 		}
 
-		link, ok := hole.GetLink(common.CurLinkKey)
+		link, ok := holeio.GetLink(common.CurLinkKey)
 		if !ok {
 			common.AddSystemMessage(messageList, "can not get connection")
 			common.ScrollToBottom(msgVScroll)
@@ -67,7 +67,7 @@ func SendFile(input *widget.Entry, messageList *fyne.Container, msgVScroll *cont
 			return
 		}
 
-		link, ok := hole.GetLink(common.CurLinkKey)
+		link, ok := holeio.GetLink(common.CurLinkKey)
 		if !ok {
 			common.AddSystemMessage(messageList, "can not get connection")
 			common.ScrollToBottom(msgVScroll)
@@ -89,7 +89,7 @@ func SendFile(input *widget.Entry, messageList *fyne.Container, msgVScroll *cont
 
 func SendClose(messageList *fyne.Container, msgVScroll *container.Scroll) common.Func {
 	return func() {
-		link, ok := hole.GetLink(common.CurLinkKey)
+		link, ok := holeio.GetLink(common.CurLinkKey)
 		if !ok {
 			common.AddSystemMessage(messageList, "can not get connection")
 			common.ScrollToBottom(msgVScroll)
@@ -146,7 +146,7 @@ func Link(w fyne.Window, input *widget.Entry) common.Func {
 		addr := input.Text
 
 		output := widget.NewEntry()
-		if err := hole.Dial(addr); err != nil {
+		if err := holeio.Dial(addr); err != nil {
 			output.SetText("link failed... please try again... err: " + err.Error())
 		} else {
 			output.SetText("success! 1s auto close")

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/xuyang-lee/wormhole/hole"
+	"github.com/xuyang-lee/wormhole/holeio"
 	"log"
 	"os"
 	"os/signal"
@@ -10,7 +10,7 @@ import (
 
 func main() {
 
-	hole.Init()
+	holeio.Init()
 
 	// 关闭: 捕获 Ctrl+C/SIGINT/SIGTERM 信号（允许 Docker/K8S 优雅下线）
 	quit := make(chan os.Signal, 1)

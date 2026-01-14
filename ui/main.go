@@ -8,7 +8,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/xuyang-lee/wormhole/config"
-	"github.com/xuyang-lee/wormhole/hole"
+	"github.com/xuyang-lee/wormhole/holeio"
 	"github.com/xuyang-lee/wormhole/ui/button"
 	"github.com/xuyang-lee/wormhole/ui/common"
 	"github.com/xuyang-lee/wormhole/ui/receive"
@@ -29,7 +29,7 @@ func main() {
 	w := a.NewWindow("P2P Sender")
 
 	// 开启后台服务
-	go hole.Init()
+	go holeio.Init()
 
 	time.Sleep(time.Second)
 	// title 信息及复制按钮
@@ -68,7 +68,7 @@ func main() {
 		common.ScrollToBottom(msgVScroll)
 	})
 	// 链接监听，注册监听者
-	hole.RegisterListener(listen)
+	holeio.RegisterListener(listen)
 	// 开启接受后台
 	go receive.Receive(a, messageList, msgVScroll)
 	//go receive.TestReceive(a, messageList, msgVScroll)
