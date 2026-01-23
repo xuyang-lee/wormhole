@@ -3,11 +3,15 @@ package utils
 import (
 	"crypto/rand"
 	"encoding/binary"
+	"fmt"
 	"github.com/google/uuid"
+	"github.com/xuyang-lee/wormhole/config/env"
+	"log"
 	"net"
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 func GetUUID() string {
@@ -37,27 +41,60 @@ func OutboundIP() (string, error) {
 	return localAddr, nil
 }
 
-func GetFilePath() string {
-	// 第一优先：exe 同目录
-	exePath, err := os.Executable()
-	if err == nil {
-		exePath, _ = filepath.EvalSymlinks(exePath)
-		exeDir := filepath.Dir(exePath)
+func ConfigFilePath() (string, error) {
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(dir, env.ServerName, "env"), nil
+}
 
-		p := filepath.Join(exeDir, "config", "config.yaml")
-		if _, err := os.Stat(p); err == nil {
-			return exeDir
-		}
+func DownloadDirPath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(home, "Downloads", env.ServerName), nil
+}
+
+func InitDownloadDir() error {
+	dir, err := DownloadDirPath()
+	if err != nil {
+		return err
 	}
 
-	// 第二优先：工作目录（go run）
-	cwd, err := os.Getwd()
-	if err == nil {
-		p := filepath.Join(cwd, "config", "config.yaml")
-		if _, err := os.Stat(p); err == nil {
-			return cwd
+	return os.MkdirAll(dir, os.ModePerm)
+}
+
+func LocalIP() (ips []string) {
+	addrList, _ := net.InterfaceAddrs()
+	for _, addr := range addrList {
+		if ipNet, ok := addr.(*net.IPNet); ok && !ipNet.IP.IsLoopback() {
+			if ipNet.IP.To4() != nil {
+				ips = append(ips, ipNet.IP.String())
+			}
 		}
 	}
+	return
+}
 
-	panic("config.yaml not found in exeDir or workingDir")
+func ExitWithErr(err error) {
+	fmt.Fprintln(os.Stderr, err.Error())
+	os.Exit(1)
+}
+
+func IfElse[T any](condition bool, trueVal, falseVal T) T {
+	if condition {
+		return trueVal
+	}
+	return falseVal
+}
+
+func HeartBeat(d time.Duration) {
+	log.Printf("heart beat logger started")
+	ticker := time.NewTicker(d)
+	defer ticker.Stop()
+	for range ticker.C {
+		log.Printf("in service...")
+	}
 }
