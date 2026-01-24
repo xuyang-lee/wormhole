@@ -30,6 +30,13 @@ func NewTextSource(text string) *TextSource {
 	}
 }
 
+func NewEmptyTextSource() *TextSource {
+	return &TextSource{
+		text: new(bytes.Buffer),
+		size: 0,
+	}
+}
+
 func (t *TextSource) Read(p []byte) (int, error) {
 	if t.r == nil {
 		t.generateReader()

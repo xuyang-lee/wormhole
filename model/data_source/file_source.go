@@ -63,6 +63,10 @@ func NewFileSource(filepath string) (*FileSource, error) {
 	return f, nil
 }
 
+func NewEmptyFileSource() *FileSource {
+	return &FileSource{}
+}
+
 func (f *FileSource) Read(p []byte) (int, error) {
 	if f.r == nil {
 		f.generateReader()

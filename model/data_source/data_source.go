@@ -33,9 +33,9 @@ func LoadToDataSource(r io.Reader) (iface.DataSource, error) {
 	var data iface.DataSource
 	switch iface.DataType(typ[0]) {
 	case iface.DataTypeFile:
-		data = &FileSource{}
+		data = NewEmptyFileSource()
 	case iface.DataTypeText:
-		data = &TextSource{}
+		data = NewEmptyTextSource()
 	default:
 		return nil, ErrDataSourceUnknownDataType
 	}
