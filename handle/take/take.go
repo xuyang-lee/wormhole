@@ -3,6 +3,7 @@ package take
 import (
 	"errors"
 	"fmt"
+	"github.com/xuyang-lee/wormhole/handle/handshake"
 	datasrc "github.com/xuyang-lee/wormhole/model/data_source"
 	iface "github.com/xuyang-lee/wormhole/model/interface"
 	"github.com/xuyang-lee/wormhole/model/transfer"
@@ -60,6 +61,12 @@ func Listen(port int, dir string) error {
 }
 
 func handleConnection(conn net.Conn, dir string) {
+	defer conn.Close()
+
+	if err := utils.TimeLimitConn(conn, 5*time.Second, handshake.Hi); err != nil {
+		log.Printf("协议错误: %v\n", err)
+		return
+	}
 
 	trans := transfer.New()
 	if _, err := trans.ReadFrom(conn); err != nil && !errors.Is(err, io.EOF) {

@@ -6,6 +6,7 @@ import (
 	"github.com/spf13/cobra"
 	envConf "github.com/xuyang-lee/wormhole/config/env"
 	"github.com/xuyang-lee/wormhole/handle/env"
+	"github.com/xuyang-lee/wormhole/handle/handshake"
 	"github.com/xuyang-lee/wormhole/model"
 	datasrc "github.com/xuyang-lee/wormhole/model/data_source"
 	iface "github.com/xuyang-lee/wormhole/model/interface"
@@ -13,6 +14,7 @@ import (
 	"github.com/xuyang-lee/wormhole/utils"
 	"log"
 	"net"
+	"time"
 )
 
 var (
@@ -58,6 +60,11 @@ func Send(cmd *cobra.Command, args []string) {
 		return
 	}
 	defer conn.Close()
+
+	if err = utils.TimeLimitConn(conn, time.Second*5, handshake.Hello); err != nil {
+		log.Printf("协议错误: %v\n", err)
+		return
+	}
 
 	// 发送数据
 	if _, err = trans.WriteTo(conn); err != nil {

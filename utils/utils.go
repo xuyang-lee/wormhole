@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/google/uuid"
 	"github.com/xuyang-lee/wormhole/config/env"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -97,4 +98,17 @@ func HeartBeat(d time.Duration) {
 	for range ticker.C {
 		log.Printf("in service...")
 	}
+}
+
+func TimeLimitConn(conn net.Conn, limit time.Duration, f func(io.ReadWriter) error) error {
+	if err := conn.SetDeadline(time.Now().Add(limit)); err != nil {
+		return err
+	}
+	if err := f(conn); err != nil {
+		return err
+	}
+	if err := conn.SetDeadline(time.Time{}); err != nil {
+		return err
+	}
+	return nil
 }
