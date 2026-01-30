@@ -6,6 +6,7 @@ import "fmt"
 type SendModeFlag string
 
 const (
+	SendModeNone SendModeFlag = ""
 	SendModeFile SendModeFlag = "file"
 	SendModeDir  SendModeFlag = "dir"
 	SendModeText SendModeFlag = "text"

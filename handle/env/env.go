@@ -3,6 +3,7 @@ package env
 import (
 	"bufio"
 	"github.com/xuyang-lee/wormhole/config/env"
+	"github.com/xuyang-lee/wormhole/model"
 	"github.com/xuyang-lee/wormhole/utils"
 	"os"
 	"path/filepath"
@@ -54,16 +55,19 @@ func parseKeyValue(k, v string) {
 		env.HolePort, _ = strconv.Atoi(v)
 	case env.KeyHoleDir:
 		env.HoleDir = v
+	case env.KeyPreferredMode:
+		env.PreferredMode = model.SendModeFlag(v)
 	}
 }
 
-func GetAllEnv() string {
+func StringAllEnv() string {
 	var sb strings.Builder
 	sb.WriteString(env.KeyDstAddr + "=" + env.DstAddr + "\n")
 	sb.WriteString(env.KeyDstIp + "=" + env.DstIp + "\n")
 	sb.WriteString(env.KeyDstPort + "=" + strconv.Itoa(env.DstPort) + "\n")
 	sb.WriteString(env.KeyHolePort + "=" + strconv.Itoa(env.HolePort) + "\n")
 	sb.WriteString(env.KeyHoleDir + "=" + env.HoleDir + "\n")
+	sb.WriteString(env.KeyPreferredMode + "=" + string(env.PreferredMode) + "\n")
 	return sb.String()
 }
 
@@ -74,7 +78,7 @@ func StoreEnvToFile() error {
 		return err
 	}
 
-	conf := GetAllEnv()
+	conf := StringAllEnv()
 
 	if err = os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 		return err

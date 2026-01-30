@@ -18,7 +18,7 @@ func Env(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	conf := env.GetAllEnv()
+	conf := env.StringAllEnv()
 
 	defaultHoleDir, err := utils.DownloadDirPath()
 	if err != nil {

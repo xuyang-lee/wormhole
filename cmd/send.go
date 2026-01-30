@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"github.com/spf13/cobra"
 	"github.com/xuyang-lee/wormhole/handle"
+	"github.com/xuyang-lee/wormhole/model"
 )
 
 var sendCmd = &cobra.Command{
 	Use:   "send",
 	Short: "send file or text",
 	Long:  "send a file or text to another hole",
-	Args:  cobra.ExactArgs(1),
+	Args:  argsHook,
 	Run:   handle.Send,
 }
 
@@ -18,39 +19,26 @@ func initSendCmd() {
 	sendCmd.Flags().StringVar(&handle.SendAddr, "addr", "", "address to send file to")
 	sendCmd.Flags().StringVar(&handle.SendIp, "ip", "", "ip to send file to")
 	sendCmd.Flags().IntVarP(&handle.SendPort, "port", "p", 0, "address to send file to")
-	sendCmd.Flags().VarP(&handle.SendMode, "mode", "m", "transform mode [file|dir|text]. default is file")
+	sendCmd.Flags().VarP(&handle.SendMode, "mode", "m", "transform mode [file|dir|text]. default use HOLE_PREFERRED_MODE if HOLE_PREFERRED_MODE had set, else use 'file'")
 
 	sendCmd.MarkFlagsMutuallyExclusive("addr", "ip")
 	sendCmd.MarkFlagsMutuallyExclusive("addr", "port")
 
 }
 
-// ModeFlag 自定义枚举类型
-type ModeFlag string
-
-const (
-	ModeFile ModeFlag = "file"
-	ModeDir  ModeFlag = "dir"
-	ModeText ModeFlag = "text"
-)
-
-// String 实现 pflag.Value 接口
-func (m *ModeFlag) String() string {
-	return string(*m)
-}
-
-// Set 实现 pflag.Value 接口 (设置值时会调用)
-func (m *ModeFlag) Set(value string) error {
-	switch value {
-	case "file", "dir", "text":
-		*m = ModeFlag(value)
-		return nil
+func argsHook(cmd *cobra.Command, args []string) error {
+	handle.ParseSendParam()
+	switch handle.SendMode {
+	case model.SendModeText:
+		if len(args) < 1 {
+			return fmt.Errorf("mode=text 时至少需要一个参数作为文本内容")
+		}
+	case model.SendModeNone, model.SendModeFile, model.SendModeDir:
+		if len(args) != 1 {
+			return fmt.Errorf("mode=file 时必须且只能提供一个参数作为文件路径")
+		}
 	default:
-		return fmt.Errorf("无效的模式: %s (有效值: file, dir, text)", value)
+		return fmt.Errorf("未知的 mode: %s (允许值: text 或 file)", string(handle.SendMode))
 	}
-}
-
-// Type 实现 pflag.Value 接口
-func (m *ModeFlag) Type() string {
-	return "mode"
+	return nil
 }

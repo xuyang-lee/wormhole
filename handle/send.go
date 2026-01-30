@@ -14,6 +14,7 @@ import (
 	"github.com/xuyang-lee/wormhole/utils"
 	"log"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -21,12 +22,12 @@ var (
 	SendAddr string
 	SendIp   string
 	SendPort int
-	SendMode model.SendModeFlag = model.SendModeFile
+	SendMode model.SendModeFlag = model.SendModeNone
 )
 
 func Send(cmd *cobra.Command, args []string) {
+	//ParseSendParam()
 
-	SendAddr = getAddr()
 	arg := args[0]
 
 	// 获取数据源
@@ -36,6 +37,7 @@ func Send(cmd *cobra.Command, args []string) {
 	case model.SendModeFile:
 		ds, err = datasrc.NewFileSource(arg)
 	case model.SendModeText:
+		arg = strings.Join(args, " ") // 支持多参数
 		ds = datasrc.NewTextSource(arg)
 	case model.SendModeDir:
 		err = errors.New("dir mode is not currently supported")
@@ -77,7 +79,17 @@ func Send(cmd *cobra.Command, args []string) {
 	return
 }
 
-func getAddr() string {
+func ParseSendParam() {
+	//加载配置文件
+	_ = env.LoadEnvFromFile()
+
+	SendAddr = parseSendAddr()
+	if SendMode == model.SendModeNone {
+		SendMode = envConf.PreferredMode
+	}
+}
+
+func parseSendAddr() string {
 	// 指定了addr
 	if SendAddr != "" {
 		return SendAddr
@@ -92,8 +104,6 @@ func getAddr() string {
 			return fmt.Sprintf("%s:%d", SendIp, SendPort)
 		}
 
-		//有未指定的，加载配置文件
-		_ = env.LoadEnvFromFile()
 		// 优先级 SendIp> 配置文件 DstIp
 		ip = utils.IfElse(SendIp != "", SendIp, envConf.DstIp)
 		// 优先级 SendPort > 配置文件 DstPort > 默认 DefaultHolePort
@@ -102,9 +112,7 @@ func getAddr() string {
 		return fmt.Sprintf("%s:%d", ip, port)
 	}
 
-	// 啥都没指定,先加载配置文件
-	_ = env.LoadEnvFromFile()
-	// 先看有没有文件保存addr
+	// 啥都没指定,先看有没有文件保存addr
 	if envConf.DstAddr != "" {
 		return envConf.DstAddr
 	}

@@ -19,6 +19,7 @@ func initSetCmd() {
 	setCmd.Flags().IntVar(&handle.SetDstPort, "dport", 0, "the port where you send file to. this flag will reset HOLE_DST_ADDR")
 	setCmd.Flags().StringVar(&handle.SetHoleDir, "dir", "", "file which you get from hole will be saved to this dir")
 	setCmd.Flags().IntVar(&handle.SetHolePort, "port", 0, "port that your hole listens on")
+	setCmd.Flags().Var(&handle.SetPreferredMode, "mode", "transform mode [file|dir|text]. default is file")
 
 	setCmd.MarkFlagsMutuallyExclusive("addr", "ip")
 	setCmd.MarkFlagsMutuallyExclusive("addr", "dport")

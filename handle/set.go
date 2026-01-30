@@ -4,15 +4,17 @@ import (
 	"github.com/spf13/cobra"
 	envConf "github.com/xuyang-lee/wormhole/config/env"
 	"github.com/xuyang-lee/wormhole/handle/env"
+	"github.com/xuyang-lee/wormhole/model"
 	"github.com/xuyang-lee/wormhole/utils"
 )
 
 var (
-	SetDstAddr  string
-	SetDstIp    string
-	SetDstPort  int
-	SetHoleDir  string
-	SetHolePort int
+	SetDstAddr       string
+	SetDstIp         string
+	SetDstPort       int
+	SetHoleDir       string
+	SetHolePort      int
+	SetPreferredMode model.SendModeFlag
 )
 
 func Set(cmd *cobra.Command, args []string) {
@@ -41,6 +43,9 @@ func Set(cmd *cobra.Command, args []string) {
 	}
 	if flags.Changed("port") {
 		envConf.HolePort = SetHolePort
+	}
+	if flags.Changed("mode") {
+		envConf.PreferredMode = SetPreferredMode
 	}
 
 	if err := env.StoreEnvToFile(); err != nil {
